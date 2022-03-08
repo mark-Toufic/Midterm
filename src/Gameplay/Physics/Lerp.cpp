@@ -70,7 +70,7 @@ void EnemyPath::Update(float deltaTime)
 {
 
 			
-				std::vector<glm::vec3> _points = { glm::vec3(18.0f, -4.0f, 1.0f), glm::vec3(-18.0f, -4.0f, 1.0f), };
+				std::vector<glm::vec3> _points = { glm::vec3(18.0f, -2.0f, 1.0f), glm::vec3(-18.0f, -2.0f, 1.0f), };
 
 				_timer += deltaTime;
 

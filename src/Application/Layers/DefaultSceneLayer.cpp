@@ -395,27 +395,66 @@ void DefaultSceneLayer::_CreateScene()
 			RenderComponent::Sptr renderer = road->Add<RenderComponent>();
 			renderer->SetMesh(roadMesh);
 			renderer->SetMaterial(roadMaterial);
-			road->SetRotation(glm::vec3(-90.f, 0.f, 90.f));
-			road->SetPostion(glm::vec3(0.f, 0.f, 1.f));
+			road->SetRotation(glm::vec3(-90.f, 0.f, 0.f));
+			road->SetPostion(glm::vec3(0.f, -1.f, 0.5f));
+			road->SetScale(glm::vec3(4.f, 0.5f, 1.0f));
 		
 			
 		}
 
 
 		// Set up all our sample objects
-		GameObject::Sptr rail = scene->CreateGameObject("road");
+		GameObject::Sptr railright1 = scene->CreateGameObject("rail");
 		{
-			// Make a big tiled mesh
-
 
 			// Create and attach a RenderComponent to the object to draw our mesh
-			RenderComponent::Sptr renderer = rail->Add<RenderComponent>();
+			RenderComponent::Sptr renderer = railright1->Add<RenderComponent>();
 			renderer->SetMesh(railMesh);
 			renderer->SetMaterial(railMaterial);
-			rail->SetRotation(glm::vec3(90.f, 0.f, -90.f));
-			rail->SetPostion(glm::vec3(0.f, 6.f, 1.f));
+			railright1->SetRotation(glm::vec3(90.f, 0.f, 0.f));
+			railright1->SetPostion(glm::vec3(0.f, -1.f, 1.f));
 
 			
+		}
+
+		GameObject::Sptr railright2 = scene->CreateGameObject("rail");
+		{
+
+			// Create and attach a RenderComponent to the object to draw our mesh
+			RenderComponent::Sptr renderer = railright2->Add<RenderComponent>();
+			renderer->SetMesh(railMesh);
+			renderer->SetMaterial(railMaterial);
+			railright2->SetRotation(glm::vec3(90.f, 0.f, 0.f));
+			railright2->SetPostion(glm::vec3(0.f, 6.f, 1.f));
+
+
+		}
+
+		// Set up all our sample objects
+		GameObject::Sptr railleft1 = scene->CreateGameObject("rail2");
+		{
+
+			// Create and attach a RenderComponent to the object to draw our mesh
+			RenderComponent::Sptr renderer = railleft1->Add<RenderComponent>();
+			renderer->SetMesh(railMesh);
+			renderer->SetMaterial(railMaterial);
+			railleft1->SetRotation(glm::vec3(90.f, 0.f, 0.f));
+			railleft1->SetPostion(glm::vec3(10.f, -1.f, 1.f));
+
+
+		}
+		// Set up all our sample objects
+		GameObject::Sptr railleft2 = scene->CreateGameObject("rail3");
+		{
+
+			// Create and attach a RenderComponent to the object to draw our mesh
+			RenderComponent::Sptr renderer = railleft2->Add<RenderComponent>();
+			renderer->SetMesh(railMesh);
+			renderer->SetMaterial(railMaterial);
+			railleft2->SetRotation(glm::vec3(90.f, 0.f, 0.f));
+			railleft2->SetPostion(glm::vec3(10.f, 6.f, 1.f));
+
+
 		}
 		
 
@@ -426,10 +465,10 @@ void DefaultSceneLayer::_CreateScene()
 			RenderComponent::Sptr renderer = frog->Add<RenderComponent>();
 			renderer->SetMesh(frogMesh);
 			renderer->SetMaterial(FrogMaterial);
-			
+			frog->SetRotation(glm::vec3(90.f, 0.f, 0.f));
 			// Set position in the scene
 			frog->SetPostion(glm::vec3(0, 4.0f, 1.f));
-			frog->SetScale(glm::vec3(0.8f, 0.8f, 0.8f));
+			frog->SetScale(glm::vec3(0.5));
 
 			frog->Add<SimpleCameraControl>();
 		
@@ -444,7 +483,7 @@ void DefaultSceneLayer::_CreateScene()
 		GameObject::Sptr car = scene->CreateGameObject("Car");
 		{
 			// Set and rotation position in the scene 
-			car->SetPostion(glm::vec3(6.0f, -4.0f, 1.0f));
+			car->SetPostion(glm::vec3(6.0f, -2.0f, 1.0f));
 			car->SetScale(glm::vec3(0.7f));
 			// Add a render component 
 			// Create and attach a renderer for the model
