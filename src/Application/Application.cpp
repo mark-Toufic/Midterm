@@ -50,6 +50,9 @@
 #include "Gameplay/Components/GUI/GuiText.h"
 #include "Gameplay/Components/ComponentManager.h"
 
+// physics
+#include "Gameplay/Physics/Lerp.h"
+
 // Layers
 #include "Layers/RenderLayer.h"
 #include "Layers/InterfaceLayer.h"
@@ -272,6 +275,7 @@ void Application::_RegisterClasses()
 	ComponentManager::RegisterType<MaterialSwapBehaviour>();
 	ComponentManager::RegisterType<TriggerVolumeEnterBehaviour>();
 	ComponentManager::RegisterType<SimpleCameraControl>();
+	ComponentManager::RegisterType<EnemyPath>();
 	ComponentManager::RegisterType<RectTransform>();
 	ComponentManager::RegisterType<GuiPanel>();
 	ComponentManager::RegisterType<GuiText>();

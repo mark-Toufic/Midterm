@@ -155,6 +155,7 @@
     <ClInclude Include="src\Gameplay\Physics\Colliders\PlaneCollider.h" />
     <ClInclude Include="src\Gameplay\Physics\Colliders\SphereCollider.h" />
     <ClInclude Include="src\Gameplay\Physics\ICollider.h" />
+    <ClInclude Include="src\Gameplay\Physics\Lerp.h" />
     <ClInclude Include="src\Gameplay\Physics\PhysicsBase.h" />
     <ClInclude Include="src\Gameplay\Physics\RigidBody.h" />
     <ClInclude Include="src\Gameplay\Physics\TriggerVolume.h" />
@@ -240,6 +241,7 @@
     <ClCompile Include="src\Gameplay\Physics\Colliders\PlaneCollider.cpp" />
     <ClCompile Include="src\Gameplay\Physics\Colliders\SphereCollider.cpp" />
     <ClCompile Include="src\Gameplay\Physics\ICollider.cpp" />
+    <ClCompile Include="src\Gameplay\Physics\Lerp.cpp" />
     <ClCompile Include="src\Gameplay\Physics\PhysicsBase.cpp" />
     <ClCompile Include="src\Gameplay\Physics\RigidBody.cpp" />
     <ClCompile Include="src\Gameplay\Physics\TriggerVolume.cpp" />

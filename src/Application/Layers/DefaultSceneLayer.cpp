@@ -58,6 +58,7 @@
 #include "Gameplay/Physics/Colliders/CylinderCollider.h"
 #include "Gameplay/Physics/TriggerVolume.h"
 #include "Graphics/DebugDraw.h"
+#include "Gameplay/Physics/Lerp.h"
 
 // GUI
 #include "Gameplay/Components/GUI/RectTransform.h"
@@ -228,16 +229,16 @@ void DefaultSceneLayer::_CreateScene()
 
 		// Create some lights for our scene
 		GameObject::Sptr lightParent = scene->CreateGameObject("Lights");
-
-		for (int ix = 0; ix < 50; ix++) {
+		{
+		
 			GameObject::Sptr light = scene->CreateGameObject("Light");
-			light->SetPostion(glm::vec3(glm::diskRand(25.0f), 1.0f));
+			light->SetPostion(glm::vec3(glm::diskRand(5.0f), 1.0f));
 			lightParent->AddChild(light);
 
 			Light::Sptr lightComponent = light->Add<Light>();
 			lightComponent->SetColor(glm::linearRand(glm::vec3(1.0f), glm::vec3(1.0f)));
 			lightComponent->SetRadius(glm::linearRand(0.1f, 10.0f));
-			lightComponent->SetIntensity(glm::linearRand(1.0f, 2.0f));
+			lightComponent->SetIntensity(glm::linearRand(100.0f, 100.0f));
 		}
 
 		// We'll create a mesh that is a simple plane that we can resize later
@@ -252,7 +253,7 @@ void DefaultSceneLayer::_CreateScene()
 		// Set up the scene's camera
 		GameObject::Sptr camera = scene->MainCamera->GetGameObject()->SelfRef();
 		{
-			camera->SetPostion({ 0, 1, 10 });
+			camera->SetPostion({ 0, 1, 7 });
 			camera->LookAt(glm::vec3(0.0f));
 
 			
@@ -263,7 +264,53 @@ void DefaultSceneLayer::_CreateScene()
 			//scene->MainCamera = cam;
 		}
 		
+		GameObject::Sptr wall = scene->CreateGameObject("Wall1");
+		{
+			// Set position in the scene
+			wall->SetPostion(glm::vec3(9.0f, 5.0f, 0.0f));
+			
 
+			// Create and attach a renderer for the model
+			RenderComponent::Sptr renderer = wall->Add<RenderComponent>();
+			renderer->SetMaterial(boxMaterial);
+			
+
+			RigidBody::Sptr wallRB = wall->Add<RigidBody>(RigidBodyType::Static);
+			wallRB->AddCollider(BoxCollider::Create(glm::vec3(1, 15, 1)));
+		}
+
+
+		GameObject::Sptr wall2 = scene->CreateGameObject("Wall2");
+		{
+			// Set position in the scene
+			wall2->SetPostion(glm::vec3(-9.0f, 5.0f, 0.0f));
+
+
+			// Create and attach a renderer for the model
+			RenderComponent::Sptr renderer = wall2->Add<RenderComponent>();
+			renderer->SetMaterial(boxMaterial);
+
+
+			RigidBody::Sptr wallRB2 = wall2->Add<RigidBody>(RigidBodyType::Static);
+			wallRB2->AddCollider(BoxCollider::Create(glm::vec3(1, 15, 1)));
+		}
+
+		GameObject::Sptr wall3 = scene->CreateGameObject("Wall3");
+		{
+			// Set position in the scene
+			wall3->SetPostion(glm::vec3(0.0f, 7.0f, 0.0f));
+
+
+			// Create and attach a renderer for the model
+			RenderComponent::Sptr renderer = wall3->Add<RenderComponent>();
+			renderer->SetMaterial(boxMaterial);
+
+
+			RigidBody::Sptr wallRB3 = wall3->Add<RigidBody>(RigidBodyType::Static);
+			wallRB3->AddCollider(BoxCollider::Create(glm::vec3(15, 1, 1)));
+		}
+
+		
 	
 
 
@@ -289,29 +336,29 @@ void DefaultSceneLayer::_CreateScene()
 
 
 		// Box to showcase the specular material
-		GameObject::Sptr Player = scene->CreateGameObject("Specular Object");
+		GameObject::Sptr frog = scene->CreateGameObject("Specular Object");
 		{
 			MeshResource::Sptr boxMesh = ResourceManager::CreateAsset<MeshResource>();
 			boxMesh->AddParam(MeshBuilderParam::CreateCube(ZERO, ONE));
 			boxMesh->GenerateMesh();
 
-			Player->Add<SimpleCameraControl>();
+			frog->Add<SimpleCameraControl>();
 
 			// Set and rotation position in the scene
-			Player->SetPostion(glm::vec3(0, -4.0f, 1.0f));
+			frog->SetPostion(glm::vec3(0, 4.0f, 1.f));
 
 			// Add a render component
-			RenderComponent::Sptr renderer = Player->Add<RenderComponent>();
+			RenderComponent::Sptr renderer = frog->Add<RenderComponent>();
 			renderer->SetMesh(boxMesh);
 			renderer->SetMaterial(testMaterial); 
 
 
 		
 
-			RigidBody::Sptr PlayerTrigger = Player->Add<RigidBody>(RigidBodyType::Dynamic);
+			RigidBody::Sptr PlayerTrigger = frog->Add<RigidBody>(RigidBodyType::Dynamic);
 			PlayerTrigger->AddCollider(SphereCollider::Create(0.75));
 			PlayerTrigger->SetLinearDamping(2.0f);
-
+			 
 			
 		}
 
@@ -319,20 +366,22 @@ void DefaultSceneLayer::_CreateScene()
 		
 
 
-		GameObject::Sptr Enemy = scene->CreateGameObject("Normal Mapped Object");
+		GameObject::Sptr car = scene->CreateGameObject("Normal Mapped Object");
 		{
 			// Set and rotation position in the scene 
-			Enemy->SetPostion(glm::vec3(6.0f, -4.0f, 1.0f));
+			car->SetPostion(glm::vec3(6.0f, -4.0f, 1.0f));
 
 			// Add a render component 
-			RenderComponent::Sptr renderer = Enemy->Add<RenderComponent>();
+			RenderComponent::Sptr renderer = car->Add<RenderComponent>();
 			renderer->SetMesh(sphere);
 			renderer->SetMaterial(normalmapMat);
+			car->Add<EnemyPath>();
+			RigidBody::Sptr carRB = car->Add<RigidBody>(RigidBodyType::Dynamic);
+			BoxCollider::Sptr collider = BoxCollider::Create(glm::vec3(1.f, 1.f, 1.f));
+			collider->SetPosition(glm::vec3(0.0f, 0.8f, 0.f));
+			carRB->AddCollider(collider);
+			carRB->SetLinearDamping(1.f);
 
-			
-
-			RigidBody::Sptr EnemyRB = Enemy->Add<RigidBody>(RigidBodyType::Static);
-			EnemyRB->AddCollider(BoxCollider::Create(glm::vec3(2, 2, 2)));
 
 		}
 
