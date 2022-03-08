@@ -143,6 +143,12 @@ void DefaultSceneLayer::_CreateScene()
 	
 		Texture2D::Sptr    frogTex = ResourceManager::CreateAsset<Texture2D>("textures/frogus_texture.png");
 		MeshResource::Sptr frogMesh = ResourceManager::CreateAsset<MeshResource>("Froggy.obj");
+		Texture2D::Sptr    carTex = ResourceManager::CreateAsset<Texture2D>("textures/car_texture.png");
+		MeshResource::Sptr carMesh = ResourceManager::CreateAsset<MeshResource>("car.obj");
+		Texture2D::Sptr    railTex = ResourceManager::CreateAsset<Texture2D>("textures/railing.png");
+		MeshResource::Sptr railMesh = ResourceManager::CreateAsset<MeshResource>("railing.obj");
+		Texture2D::Sptr    roadTex = ResourceManager::CreateAsset<Texture2D>("textures/road.png");
+		MeshResource::Sptr roadMesh = ResourceManager::CreateAsset<MeshResource>("road.obj");
 
 
 		// Load in some textures
@@ -206,12 +212,41 @@ void DefaultSceneLayer::_CreateScene()
 		// This will be our box material, with no environment reflections
 	
 
-		Material::Sptr FrogMaterial = ResourceManager::CreateAsset<Material>(basicShader);
+	
+
+		 Material::Sptr FrogMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
 		{
 			FrogMaterial->Name = "frog";
-			FrogMaterial->Set("u_Material.Diffuse", frogTex);
-			FrogMaterial->Set("u_Material.Shininess", 1.f);
+			FrogMaterial->Set("u_Material.AlbedoMap", frogTex);
+			FrogMaterial->Set("u_Material.Shininess", 0.1f);
+			FrogMaterial->Set("u_Material.NormalMap", normalMapDefault);
 		}
+
+
+		Material::Sptr carMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
+		{
+			carMaterial->Name = "frog";
+			carMaterial->Set("u_Material.AlbedoMap", carTex);
+			carMaterial->Set("u_Material.Shininess", 0.1f);
+			carMaterial->Set("u_Material.NormalMap", normalMapDefault);
+		}
+
+		Material::Sptr railMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
+		{
+			railMaterial->Name = "frog";
+			railMaterial->Set("u_Material.AlbedoMap", railTex);
+			railMaterial->Set("u_Material.Shininess", 0.1f);
+			railMaterial->Set("u_Material.NormalMap", normalMapDefault);
+		}
+
+		Material::Sptr roadMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
+		{
+			roadMaterial->Name = "frog";
+			roadMaterial->Set("u_Material.AlbedoMap", roadTex);
+			roadMaterial->Set("u_Material.Shininess", 0.1f);
+			roadMaterial->Set("u_Material.NormalMap", normalMapDefault);
+		}
+
 
 		Material::Sptr normalmapMat = ResourceManager::CreateAsset<Material>(deferredForward);
 		{
@@ -349,19 +384,49 @@ void DefaultSceneLayer::_CreateScene()
 			physics->AddCollider(BoxCollider::Create(glm::vec3(50.0f, 50.0f, 1.0f)))->SetPosition({ 0,0,-1 });
 		}
 
-		GameObject::Sptr frog = scene->CreateGameObject("Skeleton");
-		{
-			// Set position in the scene
-			frog->SetPostion(glm::vec3(1.0f, -5.0f, 0.1f));
-			frog->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
-			frog->SetScale(glm::vec3(0.8f, 0.8f, 0.8f));
 
+		// Set up all our sample objects
+		GameObject::Sptr road = scene->CreateGameObject("road");
+		{
+			// Make a big tiled mesh
+
+
+			// Create and attach a RenderComponent to the object to draw our mesh
+			RenderComponent::Sptr renderer = road->Add<RenderComponent>();
+			renderer->SetMesh(roadMesh);
+			renderer->SetMaterial(roadMaterial);
+			road->SetRotation(glm::vec3(-90.f, 0.f, 90.f));
+			road->SetPostion(glm::vec3(0.f, 0.f, 1.f));
+		
+			
+		}
+
+
+		// Set up all our sample objects
+		GameObject::Sptr rail = scene->CreateGameObject("road");
+		{
+			// Make a big tiled mesh
+
+
+			// Create and attach a RenderComponent to the object to draw our mesh
+			RenderComponent::Sptr renderer = rail->Add<RenderComponent>();
+			renderer->SetMesh(railMesh);
+			renderer->SetMaterial(railMaterial);
+			rail->SetRotation(glm::vec3(90.f, 0.f, -90.f));
+			rail->SetPostion(glm::vec3(0.f, 6.f, 1.f));
+
+			
+		}
+		
+
+		GameObject::Sptr frog = scene->CreateGameObject("Frog");
+		{
 
 			// Create and attach a renderer for the model
 			RenderComponent::Sptr renderer = frog->Add<RenderComponent>();
 			renderer->SetMesh(frogMesh);
 			renderer->SetMaterial(FrogMaterial);
-
+			
 			// Set position in the scene
 			frog->SetPostion(glm::vec3(0, 4.0f, 1.f));
 			frog->SetScale(glm::vec3(0.8f, 0.8f, 0.8f));
@@ -376,15 +441,17 @@ void DefaultSceneLayer::_CreateScene()
 		
 
 
-		GameObject::Sptr car = scene->CreateGameObject("Normal Mapped Object");
+		GameObject::Sptr car = scene->CreateGameObject("Car");
 		{
 			// Set and rotation position in the scene 
 			car->SetPostion(glm::vec3(6.0f, -4.0f, 1.0f));
-
+			car->SetScale(glm::vec3(0.7f));
 			// Add a render component 
+			// Create and attach a renderer for the model
 			RenderComponent::Sptr renderer = car->Add<RenderComponent>();
-			renderer->SetMesh(sphere);
-			renderer->SetMaterial(normalmapMat);
+			renderer->SetMesh(carMesh);
+			renderer->SetMaterial(carMaterial);
+			
 			car->Add<EnemyPath>();
 			RigidBody::Sptr carRB = car->Add<RigidBody>(RigidBodyType::Dynamic);
 			BoxCollider::Sptr collider = BoxCollider::Create(glm::vec3(1.f, 1.f, 1.f));
