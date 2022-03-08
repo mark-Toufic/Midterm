@@ -104,6 +104,12 @@ void DefaultSceneLayer::_CreateScene()
 		});
 		deferredForward->SetDebugName("Deferred - GBuffer Generation");  
 
+		ShaderProgram::Sptr basicShader = ResourceManager::CreateAsset<ShaderProgram>(std::unordered_map<ShaderPartType, std::string>{
+			{ ShaderPartType::Vertex, "shaders/vertex_shaders/basic.glsl" },
+			{ ShaderPartType::Fragment, "shaders/fragment_shaders/frag_blinn_phong_textured.glsl" }
+		});
+		basicShader->SetDebugName("Blinn-phong");
+
 		// Our foliage shader which manipulates the vertices of the mesh
 		ShaderProgram::Sptr foliageShader = ResourceManager::CreateAsset<ShaderProgram>(std::unordered_map<ShaderPartType, std::string>{
 			{ ShaderPartType::Vertex, "shaders/vertex_shaders/foliage.glsl" },
@@ -134,12 +140,15 @@ void DefaultSceneLayer::_CreateScene()
 
 
 		// Load in the meshes
-		MeshResource::Sptr monkeyMesh = ResourceManager::CreateAsset<MeshResource>("Monkey.obj");
+	
+		Texture2D::Sptr    frogTex = ResourceManager::CreateAsset<Texture2D>("textures/frogus_texture.png");
+		MeshResource::Sptr frogMesh = ResourceManager::CreateAsset<MeshResource>("Froggy.obj");
+
 
 		// Load in some textures
-		Texture2D::Sptr    boxTexture   = ResourceManager::CreateAsset<Texture2D>("textures/box-diffuse.png");
-		Texture2D::Sptr    boxSpec      = ResourceManager::CreateAsset<Texture2D>("textures/box-specular.png");
-		Texture2D::Sptr    monkeyTex    = ResourceManager::CreateAsset<Texture2D>("textures/monkey-uvMap.png");
+		
+		Texture2D::Sptr    boxTexture = ResourceManager::CreateAsset<Texture2D>("textures/box-diffuse.png");
+		Texture2D::Sptr    boxSpec = ResourceManager::CreateAsset<Texture2D>("textures/box-specular.png");
 		Texture2D::Sptr    leafTex      = ResourceManager::CreateAsset<Texture2D>("textures/leaves.png");
 		leafTex->SetMinFilter(MinFilter::Nearest);
 		leafTex->SetMagFilter(MagFilter::Nearest);
@@ -195,25 +204,14 @@ void DefaultSceneLayer::_CreateScene()
 
 		// Create our materials
 		// This will be our box material, with no environment reflections
-		Material::Sptr boxMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
-		{
-			boxMaterial->Name = "Box";
-			boxMaterial->Set("u_Material.AlbedoMap", boxTexture);
-			boxMaterial->Set("u_Material.Shininess", 0.1f);
-			boxMaterial->Set("u_Material.NormalMap", normalMapDefault);
-		}
+	
 
-		
-		// This will be the reflective material, we'll make the whole thing 50% reflective
-		Material::Sptr testMaterial = ResourceManager::CreateAsset<Material>(deferredForward); 
+		Material::Sptr FrogMaterial = ResourceManager::CreateAsset<Material>(basicShader);
 		{
-			testMaterial->Name = "Box-Specular";
-			testMaterial->Set("u_Material.AlbedoMap", boxTexture); 
-			testMaterial->Set("u_Material.Specular", boxSpec);
-			testMaterial->Set("u_Material.NormalMap", normalMapDefault);
+			FrogMaterial->Name = "frog";
+			FrogMaterial->Set("u_Material.Diffuse", frogTex);
+			FrogMaterial->Set("u_Material.Shininess", 1.f);
 		}
-
-		
 
 		Material::Sptr normalmapMat = ResourceManager::CreateAsset<Material>(deferredForward);
 		{
@@ -226,6 +224,25 @@ void DefaultSceneLayer::_CreateScene()
 			normalmapMat->Set("u_Material.Shininess", 0.5f);
 			normalmapMat->Set("u_Scale", 0.1f);
 		}
+
+		Material::Sptr boxMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
+		{
+			boxMaterial->Name = "Box";
+			boxMaterial->Set("u_Material.AlbedoMap", boxTexture);
+			boxMaterial->Set("u_Material.Shininess", 0.1f);
+			boxMaterial->Set("u_Material.NormalMap", normalMapDefault);
+		}
+
+
+		// This will be the reflective material, we'll make the whole thing 50% reflective
+		Material::Sptr testMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
+		{
+			testMaterial->Name = "Box-Specular";
+			testMaterial->Set("u_Material.AlbedoMap", boxTexture);
+			testMaterial->Set("u_Material.Specular", boxSpec);
+			testMaterial->Set("u_Material.NormalMap", normalMapDefault);
+		}
+
 
 		// Create some lights for our scene
 		GameObject::Sptr lightParent = scene->CreateGameObject("Lights");
@@ -332,36 +349,29 @@ void DefaultSceneLayer::_CreateScene()
 			physics->AddCollider(BoxCollider::Create(glm::vec3(50.0f, 50.0f, 1.0f)))->SetPosition({ 0,0,-1 });
 		}
 
-		
-
-
-		// Box to showcase the specular material
-		GameObject::Sptr frog = scene->CreateGameObject("Specular Object");
+		GameObject::Sptr frog = scene->CreateGameObject("Skeleton");
 		{
-			MeshResource::Sptr boxMesh = ResourceManager::CreateAsset<MeshResource>();
-			boxMesh->AddParam(MeshBuilderParam::CreateCube(ZERO, ONE));
-			boxMesh->GenerateMesh();
+			// Set position in the scene
+			frog->SetPostion(glm::vec3(1.0f, -5.0f, 0.1f));
+			frog->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+			frog->SetScale(glm::vec3(0.8f, 0.8f, 0.8f));
+
+
+			// Create and attach a renderer for the model
+			RenderComponent::Sptr renderer = frog->Add<RenderComponent>();
+			renderer->SetMesh(frogMesh);
+			renderer->SetMaterial(FrogMaterial);
+
+			// Set position in the scene
+			frog->SetPostion(glm::vec3(0, 4.0f, 1.f));
+			frog->SetScale(glm::vec3(0.8f, 0.8f, 0.8f));
 
 			frog->Add<SimpleCameraControl>();
-
-			// Set and rotation position in the scene
-			frog->SetPostion(glm::vec3(0, 4.0f, 1.f));
-
-			// Add a render component
-			RenderComponent::Sptr renderer = frog->Add<RenderComponent>();
-			renderer->SetMesh(boxMesh);
-			renderer->SetMaterial(testMaterial); 
-
-
 		
-
 			RigidBody::Sptr PlayerTrigger = frog->Add<RigidBody>(RigidBodyType::Dynamic);
 			PlayerTrigger->AddCollider(SphereCollider::Create(0.75));
 			PlayerTrigger->SetLinearDamping(2.0f);
-			 
-			
 		}
-
 
 		
 
